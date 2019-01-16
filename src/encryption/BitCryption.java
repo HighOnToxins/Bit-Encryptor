@@ -5,8 +5,25 @@ import java.util.Base64;
 import java.util.Scanner;
 
 public class BitCryption { 	
+	//getting master key
+	private static String getMasterKey(String binKey) {
+		
+		//getting variables
+		String masterKey = binKey.substring(0, 8);
+		
+		//running loop
+		for (int i = 1; i < binKey.length() / 8; i++) {
+			//encrypting
+			masterKey = encrypt(masterKey, binKey.substring(i * 8, i * 8 + 8));
+		}
+		
+		//returning
+		return masterKey;
+	}
+	
 	//Small and easy encryption code
 	private static String encrypt(String binTxt, String binKey) {
+		//getting variables
 		String enBin = "";
 		
 		//running through text of bits and change by using (first bit XOR second bit)
@@ -15,20 +32,8 @@ public class BitCryption {
 			enBin += binTxt.charAt(i) == '1' ^ binKey.charAt(i % binKey.length()) == '1' ? '1' : '0';
 		}
 		
+		//Returning
 		return enBin;
-	}
-	
-	//change direction of text
-	private static String reverse(String txt) {
-		//reverse
-		String rev = "";
-		
-		//for lopping this stuff
-		for (int i = txt.length() - 1; i >= 0; i--) {
-			rev += txt.charAt(i);
-		}
-		
-		return rev;
 	}
 	
 	//---------------------------ENCRYPTOR ITSELF---------------------------
@@ -36,23 +41,21 @@ public class BitCryption {
 	public static String encryptor(String txt, String key) {
 		try {
 			//first we add the variables and convert to bits
-			String txtBits = new BigInteger(txt.getBytes()).toString(2);
-			String keyBits = new BigInteger(key.getBytes()).toString(2);
+			txt = new BigInteger(txt.getBytes()).toString(2);
+			key = new BigInteger(key.getBytes()).toString(2);
 			
 			//fixing binary
-			while(txtBits.length() % 8 != 0) txtBits = '0' + txtBits;
-			while(keyBits.length() % 8 != 0) keyBits = '0' + keyBits;
+			while(txt.length() % 8 != 0) txt = '0' + txt;
+			while(key.length() % 8 != 0) key = '0' + key;
 			
 			//running master encryption
-			keyBits = encrypt(keyBits, reverse(keyBits));
-			txtBits = encrypt(txtBits, keyBits);
+			key = getMasterKey(key);
+			txt = encrypt(txt, key);
 			
 			//changing to base 64 and returning encrypted data
-			return Base64.getEncoder().encodeToString(new BigInteger(txtBits, 2).toByteArray()).replace("=", "");
+			return Base64.getEncoder().encodeToString(new BigInteger(txt, 2).toByteArray()).replace("=", "");
 		} catch (Exception e) {
-			System.err.println("You cann't use a key at a length of ZERO!");
-			e.printStackTrace();
-			
+			System.err.println("You cann't use a bitKey at a length of ZERO!");
 			return "";
 		}
 	}
@@ -61,21 +64,22 @@ public class BitCryption {
 	public static String decryptor(String txt, String key) {
 		try {
 			//first we add the variables and convert to bits and getting data from base 64
-			String txtBits = new BigInteger(Base64.getDecoder().decode(txt)).toString(2);
-			String keyBits = new BigInteger(key.getBytes()).toString(2);
+			txt = new BigInteger(Base64.getDecoder().decode(txt)).toString(2);
+			key = new BigInteger(key.getBytes()).toString(2);
 			
 			//fixing binary
-			while(txtBits.length() % 8 != 0) txtBits = '0' + txtBits;
-			while(keyBits.length() % 8 != 0) keyBits = '0' + keyBits;
-
-			//running master decryption
-			keyBits = encrypt(keyBits, reverse(keyBits));
-			txtBits = encrypt(txtBits, keyBits);
+			while(txt.length() % 8 != 0) txt = '0' + txt;
+			while(key.length() % 8 != 0) key = '0' + key;
+			
+			//running master encryption
+			key = getMasterKey(key);
+			txt = encrypt(txt, key);
 			
 			//returning encrypted data
-			return new String(new BigInteger(txtBits, 2).toByteArray());
+			return new String(new BigInteger(txt, 2).toByteArray());
 		} catch (Exception e) {
 			System.err.println("You cann't use a key at a length of ZERO!");
+			e.printStackTrace();
 			return "";
 		}
 	}
