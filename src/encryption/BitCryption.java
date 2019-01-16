@@ -5,53 +5,75 @@ import java.util.Base64;
 import java.util.Scanner;
 
 public class BitCryption { 	
+	//Small and easy encryption code
+	private static String encrypt(String binTxt, String binKey) {
+		String enBin = "";
+		
+		//running through text of bits and change by using (first bit XOR second bit)
+		for (int i = 0; i < binTxt.length(); i++) {
+			//adding next bit to the encrypted data, by using XOR gate on current text bit and key bit
+			enBin += binTxt.charAt(i) == '1' ^ binKey.charAt(i % binKey.length()) == '1' ? '1' : '0';
+		}
+		
+		return enBin;
+	}
+	
+	//change direction of text
+	private static String reverse(String txt) {
+		//reverse
+		String rev = "";
+		
+		//for lopping this stuff
+		for (int i = txt.length() - 1; i >= 0; i--) {
+			rev += txt.charAt(i);
+		}
+		
+		return rev;
+	}
+	
 	//---------------------------ENCRYPTOR ITSELF---------------------------
 	//encrypting string
-	public static String encrypt(String txt, String key) {
+	public static String encryptor(String txt, String key) {
 		try {
 			//first we add the variables and convert to bits
 			String txtBits = new BigInteger(txt.getBytes()).toString(2);
 			String keyBits = new BigInteger(key.getBytes()).toString(2);
-			String enTxtBits = "";
 			
 			//fixing binary
 			while(txtBits.length() % 8 != 0) txtBits = '0' + txtBits;
 			while(keyBits.length() % 8 != 0) keyBits = '0' + keyBits;
 			
-			//running through text of bits and change by using (first bit XOR second bit)
-			for (int i = 0; i < txtBits.length(); i++) {
-				//adding next bit to the encrypted data, by using XOR gate on current text bit and key bit
-				enTxtBits += txtBits.charAt(i) == '1' ^ keyBits.charAt(i % keyBits.length()) == '1' ? '1' : '0';
-			}
+			//running master encryption
+			keyBits = encrypt(keyBits, reverse(keyBits));
+			txtBits = encrypt(txtBits, keyBits);
 			
 			//changing to base 64 and returning encrypted data
-			return Base64.getEncoder().encodeToString(new BigInteger(enTxtBits, 2).toByteArray()).replace("=", "");
+			return Base64.getEncoder().encodeToString(new BigInteger(txtBits, 2).toByteArray()).replace("=", "");
 		} catch (Exception e) {
 			System.err.println("You cann't use a key at a length of ZERO!");
+			e.printStackTrace();
+			
 			return "";
 		}
 	}
 	
 	//decrypting string
-	public static String decrypt(String txt, String key) {
+	public static String decryptor(String txt, String key) {
 		try {
 			//first we add the variables and convert to bits and getting data from base 64
 			String txtBits = new BigInteger(Base64.getDecoder().decode(txt)).toString(2);
 			String keyBits = new BigInteger(key.getBytes()).toString(2);
-			String enTxtBits = "";
 			
 			//fixing binary
 			while(txtBits.length() % 8 != 0) txtBits = '0' + txtBits;
 			while(keyBits.length() % 8 != 0) keyBits = '0' + keyBits;
 
-			//running through text of bits and change by using (first bit XOR second bit)
-			for (int i = 0; i < txtBits.length(); i++) {
-				//adding next bit to the encrypted data, by using XOR gate on current text bit and key bit
-				enTxtBits += txtBits.charAt(i) == '1' ^ keyBits.charAt(i % keyBits.length()) == '1' ? '1' : '0';
-			}
+			//running master decryption
+			keyBits = encrypt(keyBits, reverse(keyBits));
+			txtBits = encrypt(txtBits, keyBits);
 			
 			//returning encrypted data
-			return new String(new BigInteger(enTxtBits, 2).toByteArray());
+			return new String(new BigInteger(txtBits, 2).toByteArray());
 		} catch (Exception e) {
 			System.err.println("You cann't use a key at a length of ZERO!");
 			return "";
@@ -98,12 +120,12 @@ public class BitCryption {
 				
 				//encryption
 				if (txt.equalsIgnoreCase("En")) {
-					System.out.printf("\n\nEncrypted Data:\n%s\n\n", encrypt(data, key));
+					System.out.printf("\n\nEncrypted Data:\n%s\n\n", encryptor(data, key));
 				}
 
 				//decryption
 				if(txt.equalsIgnoreCase("De")) {
-					System.out.printf("\n\nDecrypted Data:\n%s\n\n", decrypt(data, key));
+					System.out.printf("\n\nDecrypted Data:\n%s\n\n", decryptor(data, key));
 				}
 			}
 		}while(run);
