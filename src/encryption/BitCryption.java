@@ -63,35 +63,50 @@ public class BitCryption {
 		//variables
 		Scanner in = new Scanner(System.in);
 		
-		//encryption or decryptions
-		boolean ask = true;
-		String txt = "";
+		boolean run = true;
+		
+		//keep running
 		do {
-			//asking
-			System.out.print("En/De: ");
-			txt = in.nextLine().replace(" ", "");
+			//encryption or decryptions
+			boolean ask = true;
+			String txt = "";
+			do {
+				//asking
+				System.out.print("En / De / Out: ");
+				txt = in.nextLine().replace(" ", "");
+				
+				//checking
+				if (txt.equalsIgnoreCase("En") || txt.equalsIgnoreCase("De") || txt.equalsIgnoreCase("Out")) {
+					ask = false;
+				}else{
+					//if no correct awnser make space
+					System.out.print("\n\n\n\n\n\n");
+				}
+			}while(ask);
 			
-			//checking
-			if (txt.equalsIgnoreCase("En") || txt.equalsIgnoreCase("De")) {
-				ask = false;
-			}else{
-				//if no correct awnser make space
-				System.out.print("\n\n\n\n\n\n");
+			//checking if wanting to exit
+			if(txt.equalsIgnoreCase("Out")) {
+				System.out.print("\nYou have exited the program\n");
+				run = false;
+			}else {
+				//getting information
+				System.out.println("\nTEXT: ");
+				String data = in.nextLine();
+				
+				System.out.println("\nKEY: ");
+				String key = in.nextLine();
+				
+				//encryption
+				if (txt.equalsIgnoreCase("En")) {
+					System.out.printf("\n\nEncrypted Data:\n%s\n\n", encrypt(data, key));
+				}
+
+				//decryption
+				if(txt.equalsIgnoreCase("De")) {
+					System.out.printf("\n\nDecrypted Data:\n%s\n\n", decrypt(data, key));
+				}
 			}
-		}while(ask);
-		
-		//getting needed information : data + key
-		System.out.println("\nTEXT: ");
-		String data = in.nextLine();
-		
-		System.out.println("\nKEY: ");
-		String key = in.nextLine();
-		
-		//encryption
-		if (txt.equalsIgnoreCase("En")) System.out.print("\n\nEncrypted Data:\n" + encrypt(data, key));
-		
-		//decryption
-		if(txt.equalsIgnoreCase("De")) System.out.print("\n\nDecrypted Data:\n" + decrypt(data, key));
+		}while(run);
 		
 		//closing scanner
 		in.close();
