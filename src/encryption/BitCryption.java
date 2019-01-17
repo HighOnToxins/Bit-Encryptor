@@ -9,16 +9,19 @@ public class BitCryption {
 	private static String getMasterKey(String binKey) {
 		
 		//getting variables
-		String masterKey = binKey.substring(0, 8);
+		String superKey = binKey.substring(0, 8);
 		
 		//running loop
 		for (int i = 1; i < binKey.length() / 8; i++) {
 			//encrypting
-			masterKey = encrypt(masterKey, binKey.substring(i * 8, i * 8 + 8));
+			superKey = encrypt(superKey, binKey.substring(i * 8, i * 8 + 8));
 		}
 		
+		//encrypting binary key using super key and getting a master key
+		superKey = encrypt(binKey, superKey);
+		
 		//returning
-		return masterKey;
+		return superKey;
 	}
 	
 	//Small and easy encryption code
