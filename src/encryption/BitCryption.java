@@ -4,7 +4,7 @@ import java.math.BigInteger;
 import java.util.Base64;
 import java.util.Scanner;
 
-public class BitCryption { 	
+public class BitCryption {
 	//getting master key
 	private static String getMasterKey(String binKey) {
 		
@@ -55,10 +55,11 @@ public class BitCryption {
 			key = getMasterKey(key);
 			txt = encrypt(txt, key);
 			
-			//changing to base 64 and returning encrypted data
+			//changing to base 64 and returning encrypted data and replacing end equals with nothing
 			return Base64.getEncoder().encodeToString(new BigInteger(txt, 2).toByteArray()).replace("=", "");
 		} catch (Exception e) {
-			System.err.println("You cann't use a bitKey at a length of ZERO!");
+			System.err.printf("You can not use \"%s\" or \"%s\"",
+					txt, key);
 			return "";
 		}
 	}
@@ -81,8 +82,8 @@ public class BitCryption {
 			//returning encrypted data
 			return new String(new BigInteger(txt, 2).toByteArray());
 		} catch (Exception e) {
-			System.err.println("You cann't use a key at a length of ZERO!");
-			e.printStackTrace();
+			System.err.printf("You can not use \"%s\" or \"%s\"",
+					txt, key);
 			return "";
 		}
 	}
@@ -92,9 +93,8 @@ public class BitCryption {
 		//variables
 		Scanner in = new Scanner(System.in);
 		
-		boolean run = true;
-		
 		//keep running
+		boolean run = true;
 		do {
 			//encryption or decryptions
 			boolean ask = true;
@@ -108,7 +108,7 @@ public class BitCryption {
 				if (txt.equalsIgnoreCase("En") || txt.equalsIgnoreCase("De") || txt.equalsIgnoreCase("Out")) {
 					ask = false;
 				}else{
-					//if no correct awnser make space
+					//if no correct answer make space
 					System.out.print("\n\n\n\n\n\n");
 				}
 			}while(ask);
